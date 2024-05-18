@@ -1,4 +1,3 @@
-
 export enum TILE_TYPE_ENUM {
     WALL_ROW = 'WALL_ROW',
     WALL_COLUMN = 'WALL_COLUMN',
@@ -27,11 +26,31 @@ export enum CONTROLLER_ENUM {
 }
 
 export enum FSM_PARAMS_TYPE_ENUM {
+    NUMBER = 'NUMBER',
     TRIGGER = 'TRIGGER',
-    ATTACK = 'ATTACK'
 }
 
 export enum PARAM_NAME_ENUM {
     IDLE = 'IDLE',
+    TURNLEFT = 'TURNLEFT',
+    DIRECTION = 'DIRECTION'
+}
+
+export enum DIRECTION_ENUM {
+    TOP = 'TOP',
+    BOTTOM = 'BOTTOM',
+    LEFT = 'LEFT',
+    RIGHT = 'RIGHT',
+}
+
+export enum ENTITY_STATE_ENUM {
+    IDLE = 'IDLE',
     TURNLEFT = 'TURNLEFT'
+}
+
+export enum DIRECTION_ORDER_ENUM {
+    TOP = 0,
+    BOTTOM = 1,
+    LEFT = 2,
+    RIGHT = 3
 }

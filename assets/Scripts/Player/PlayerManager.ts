@@ -8,12 +8,19 @@ import {
     animation,
     SpriteFrame
 } from 'cc';
-import { CONTROLLER_ENUM, EVENT_ENUM, PARAM_NAME_ENUM } from '../../Enums';
+import {
+    CONTROLLER_ENUM,
+    DIRECTION_ENUM,
+    EVENT_ENUM,
+    PARAM_NAME_ENUM,
+    ENTITY_STATE_ENUM,
+    DIRECTION_ORDER_ENUM
+} from '../../Enums';
 import EventManagerInstance from '../../Runtime/EventManager';
 import ResourceManagerInstance from '../../Runtime/ResourceManager';
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager';
 import { PlayerStateMachine } from './PlayerStateMachine';
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 const ANIMATION_SPEED = 1/8;
 
@@ -25,7 +32,28 @@ export class PlayerManager extends Component {
     targetX: number = 0;
     targetY: number = 0;
     private readonly speed = 1/10;
-    fsm: PlayerStateMachine
+    fsm: PlayerStateMachine;
+
+    private _direction: DIRECTION_ENUM;
+    private _state: ENTITY_STATE_ENUM;
+
+    get direction(): DIRECTION_ENUM {
+        return this._direction;
+    }
+
+    set direction(_direction: DIRECTION_ENUM) {
+        this._direction = _direction;
+        this.fsm.setParams(PARAM_NAME_ENUM.TURNLEFT, DIRECTION_ORDER_ENUM[_direction]);
+    }
+
+    get state(): ENTITY_STATE_ENUM{
+        return this._state;
+    }
+
+    set state(state: ENTITY_STATE_ENUM) {
+        this._state = state;
+        this.fsm.setParams(state, true);
+    }
 
     async init() {
         const sprite = this.addComponent(Sprite);
@@ -37,7 +65,8 @@ export class PlayerManager extends Component {
         this.fsm = this.addComponent(PlayerStateMachine);
 
         await this.fsm.init();
-        this.fsm.setParams(PARAM_NAME_ENUM.IDLE, true);
+        this.state = ENTITY_STATE_ENUM.IDLE;
+        // this.fsm.setParams(PARAM_NAME_ENUM.IDLE, true);
         // this.render();
 
         EventManagerInstance.on(EVENT_ENUM.PLAYER_CTRL, this.move);
@@ -72,7 +101,6 @@ export class PlayerManager extends Component {
     }
 
     move = (inputDirection: CONTROLLER_ENUM) => {
-        console.log('move', inputDirection);
         if (inputDirection === CONTROLLER_ENUM.TOP) {
             this.targetY--;
         } else if(inputDirection === CONTROLLER_ENUM.BOTTOM) {
@@ -82,7 +110,16 @@ export class PlayerManager extends Component {
         } else if(inputDirection === CONTROLLER_ENUM.RIGHT) {
             this.targetX++;
         } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
-            this.fsm.setParams(PARAM_NAME_ENUM.TURNLEFT, true);
+            if(this.direction === DIRECTION_ENUM.TOP) {
+                this.direction = DIRECTION_ENUM.LEFT;
+            } else if(this.direction === DIRECTION_ENUM.LEFT) {
+                this.direction = DIRECTION_ENUM.BOTTOM;
+            } else if(this.direction === DIRECTION_ENUM.BOTTOM) {
+                this.direction = DIRECTION_ENUM.RIGHT;
+            } else if(this.direction === DIRECTION_ENUM.RIGHT) {
+                this.direction = DIRECTION_ENUM.TOP;
+            }
+            this.state = ENTITY_STATE_ENUM.TURNLEFT;
         }
     }
 
